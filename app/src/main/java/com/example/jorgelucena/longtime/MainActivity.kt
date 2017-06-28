@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
             // Orientation
             val rotation = windowManager.defaultDisplay.rotation
             captureBuilder?.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
-            val file = File("${Environment.getExternalStorageDirectory()}/pic.jpg")
+            val file = File("${Environment.getExternalStorageDirectory()}/${System.currentTimeMillis()}picture.jpg")
             val readerListener = object:ImageReader.OnImageAvailableListener {
                 override fun onImageAvailable(reader:ImageReader) {
                     var image: Image? = null
@@ -269,7 +269,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         Log.e(TAG, "onPause")
-        //closeCamera();
         stopBackgroundThread()
         super.onPause()
     }
@@ -277,7 +276,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private val TAG = "AndroidCameraApi"
         private val ORIENTATIONS = SparseIntArray()
-        init{
+        init {
             ORIENTATIONS.append(Surface.ROTATION_0, 90)
             ORIENTATIONS.append(Surface.ROTATION_90, 0)
             ORIENTATIONS.append(Surface.ROTATION_180, 270)
