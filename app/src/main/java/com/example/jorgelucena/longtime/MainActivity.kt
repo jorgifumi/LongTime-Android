@@ -32,12 +32,8 @@ class MainActivity : AppCompatActivity() {
     lateinit private var cameraId: String
     private var cameraDevice: CameraDevice? = null
     lateinit private var cameraCaptureSessions: CameraCaptureSession
-    //lateinit private var captureRequest: CaptureRequest
     private var captureRequestBuilder: CaptureRequest.Builder? = null
     lateinit private var imageDimension: Size
-    //lateinit private var imageReader: ImageReader
-    //lateinit private var file: File
-    //private val mFlashSupported:Boolean = false
     private var mBackgroundHandler: Handler? = null
     private var mBackgroundThread: HandlerThread? = null
 
@@ -70,14 +66,6 @@ class MainActivity : AppCompatActivity() {
             cameraDevice = null
         }
     }
-
-    /*internal val captureCallbackListener:CameraCaptureSession.CaptureCallback = object:CameraCaptureSession.CaptureCallback() {
-        override fun onCaptureCompleted(session:CameraCaptureSession, request:CaptureRequest, result:TotalCaptureResult) {
-            super.onCaptureCompleted(session, request, result)
-            Toast.makeText(this@MainActivity, "Saved:" + file, Toast.LENGTH_SHORT).show()
-            createCameraPreview()
-        }
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -256,17 +244,6 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-
-    /*private fun closeCamera() {
-        if (null != cameraDevice) {
-            cameraDevice?.close()
-            cameraDevice = null
-        }
-        if (null != imageReader) {
-            imageReader.close()
-            imageReader = null
-        }
-    }*/
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
