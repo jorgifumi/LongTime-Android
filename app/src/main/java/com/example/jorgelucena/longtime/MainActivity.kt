@@ -3,6 +3,8 @@ package com.example.jorgelucena.longtime
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
@@ -20,6 +22,7 @@ import android.util.SparseIntArray
 import android.view.Surface
 import android.view.TextureView
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import java.io.*
 import java.util.*
@@ -29,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit private var takePictureButton: Button
     lateinit private var textureView: TextureView
+    lateinit private var imageView: ImageView
     lateinit private var cameraId: String
     private var cameraDevice: CameraDevice? = null
     lateinit private var cameraCaptureSessions: CameraCaptureSession
@@ -36,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     lateinit private var imageDimension: Size
     private var mBackgroundHandler: Handler? = null
     private var mBackgroundThread: HandlerThread? = null
+    private var imageBitmap: Bitmap? = null
 
     internal var textureListener: TextureView.SurfaceTextureListener = object:TextureView.SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width:Int, height:Int) {
@@ -79,6 +84,9 @@ class MainActivity : AppCompatActivity() {
         takePictureButton.setOnClickListener { _ ->
             takePicture()
         }
+
+        imageView = findViewById(R.id.imageView)
+        imageView.imageAlpha = 150
     }
 
     private fun startBackgroundThread() {
@@ -166,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onCaptureCompleted(session:CameraCaptureSession, request:CaptureRequest, result:TotalCaptureResult) {
                     super.onCaptureCompleted(session, request, result)
                     Toast.makeText(this@MainActivity, "Saved:" + file, Toast.LENGTH_SHORT).show()
+                    imageBitmap = BitmapFactory.decodeFile(file.absolutePath)
                     createCameraPreview()
                 }
             }
@@ -192,6 +201,10 @@ class MainActivity : AppCompatActivity() {
             val surface = Surface(texture)
             captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             captureRequestBuilder?.addTarget(surface)
+            // Orientation
+            val rotation = windowManager.defaultDisplay.rotation
+            captureRequestBuilder?.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
+
             cameraDevice?.createCaptureSession(listOf(surface), object:CameraCaptureSession.StateCallback() {
                 override fun onConfigured(cameraCaptureSession:CameraCaptureSession) {
                     // When the session is ready, we start displaying the preview.
@@ -236,6 +249,12 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "updatePreview error, return")
         }
         captureRequestBuilder?.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+        if (imageBitmap != null) {
+
+            runOnUiThread {
+                imageView.setImageBitmap(imageBitmap)
+            }
+        }
         try
         {
             cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder?.build(), null, mBackgroundHandler)
